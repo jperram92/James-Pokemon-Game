@@ -3,13 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D Pokémon-Style Game</title>
+    <title>IsaakMon Adventures</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        canvas {
+            border: 2px solid #444;
+            display: block;
+            margin: 0 auto;
+            background: #000;
+        }
+        #loadingMessage {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>IsaakMon Adventures</h1>
+    <h1 style="text-align: center;">IsaakMon Adventures</h1>
+    <p id="loadingMessage">Loading game assets, please wait...</p>
     <canvas id="gameCanvas" width="640" height="480"></canvas>
-    <script src="map.js"></script>
-    <script src="game.js"></script>
+
+    <noscript>
+        <p style="text-align: center; color: red;">
+            This game requires JavaScript to run. Please enable JavaScript in your browser.
+        </p>
+    </noscript>
+
+    <!-- JavaScript Modules -->
+    <script src="npc.js" type="module"></script>
+    <script src="map.js" type="module"></script>
+    <script src="game.js" type="module"></script>
 </body>
 </html>
