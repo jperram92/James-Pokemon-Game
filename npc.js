@@ -1,5 +1,6 @@
 // npc.js
 import { ctx, enemyImg } from './assets.js';
+import { startBattle } from './battle.js'; // Import startBattle here
 
 export let chatActive = false;
 export function setChatActive(state) {
@@ -39,6 +40,12 @@ function checkNpcInteraction(player) {
         ) {
             chatActive = true;
             currentNpcMessage = npc.message;
+
+            // Trigger Battle after Chat
+            setTimeout(() => {
+                chatActive = false;
+                startBattle(); // Call startBattle after chat
+            }, 2000); // Wait 2 seconds after chatting
         }
     });
 }
