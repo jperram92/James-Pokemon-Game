@@ -8,9 +8,9 @@ export function setChatActive(state) {
 
 // NPC Configuration
 const npcs = [
-    { id: 1, x: 300, y: 800, width: 50, height: 50, message: "Hello! I'm NPC 1.", direction: 'right', speed: 1, range: 100, startX: 300 },
-    { id: 2, x: 600, y: 600, width: 50, height: 50, message: "Greetings, traveler!", direction: 'left', speed: 1, range: 50, startX: 600 },
-    { id: 3, x: 200, y: 400, width: 50, height: 50, message: "Beware of the forest ahead.", direction: 'up', speed: 1, range: 75, startY: 400 }
+    { id: 1, x: 300, y: 800, width: 50, height: 50, message: "Hello! I'm NPC 1.", direction: 'right', speed: 0.25, range: 100, startX: 300 },
+    { id: 2, x: 600, y: 600, width: 50, height: 50, message: "Greetings, traveler!", direction: 'left', speed: 0.25, range: 50, startX: 600 },
+    { id: 3, x: 200, y: 400, width: 50, height: 50, message: "Beware of the forest ahead.", direction: 'up', speed: 0.25, range: 75, startY: 400 }
 ];
 
 let currentNpcMessage = '';

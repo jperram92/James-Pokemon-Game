@@ -15,7 +15,7 @@ const player = {
     y: 924, // Map height - canvas height
     width: 50,
     height: 50,
-    speed: 5,
+    speed: 1,
 };
 
 // Camera Object
