@@ -53,11 +53,14 @@ function updatePlayerAndCamera() {
     }
     if (!checkCollision(player.x, newY, player)) {
         player.y = newY;
+<<<<<<< HEAD
     }
 
     // Check interaction with NPCs
     if (keys[' '] && !chatActive) {
         checkNpcInteraction(player);
+=======
+>>>>>>> b24c65956e0d7fe7e728b798a04373faf6791b19
     }
 
     player.x = Math.max(0, Math.min(player.x, 2048 - player.width));
