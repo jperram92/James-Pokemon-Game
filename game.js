@@ -15,7 +15,7 @@ const player = {
     y: 924,
     width: 50,
     height: 50,
-    speed: 2,
+    speed: 0.5,
     health: 100,
 };
 
