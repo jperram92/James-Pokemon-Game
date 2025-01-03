@@ -1,113 +1,144 @@
-import { ctx, battleBackgroundImg, playerImg, enemyImg } from './assets.js';
+import { ctx, canvas, battleBackgroundImg, playerImg, enemyImg } from './assets.js';
 
+// 🛡️ Battle State
+export let battleState = {
+    active: false,
+    transitioning: false,
+    playerTurn: true,
+    enemyTurn: false,
+};
 
-// Battle State
-export let battleState = { active: false };
+// Battle Variables
+let playerHP = 100;
+let enemyHP = 100;
+let playerMaxHP = 100;
+let enemyMaxHP = 100;
 
-export function renderBattle() {
-    renderBattleScene();
+let battleOptions = ['Attack', 'Run'];
+let attackMoves = ['Slash', 'Fireball'];
+let currentMenu = 'main';
+
+// 🎬 Pagination Transition Effect
+function transitionToBattle(callback) {
+    let opacity = 0;
+    battleState.transitioning = true;
+
+    function fadeIn() {
+        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        opacity += 0.05;
+
+        if (opacity < 1) {
+            requestAnimationFrame(fadeIn);
+        } else {
+            battleState.transitioning = false;
+            battleState.active = true;
+            callback();
+        }
+    }
+    fadeIn();
 }
 
-// Initialize Battle Controls
+// 🎮 Initialize Battle Controls
 export function initializeBattleControls() {
-    console.log('🎮 Battle controls initialized.');
     window.addEventListener('keydown', (e) => {
-        if (battleState.active && ['1', '2', '3', '4'].includes(e.key)) {
-            handlePlayerAction(e.key);
+        if (battleState.active && !battleState.transitioning) {
+            if (currentMenu === 'main') {
+                handleMainMenu(e.key);
+            } else if (currentMenu === 'attack') {
+                handleAttackMenu(e.key);
+            }
         }
     });
 }
 
-// Battle State
-let playerHP = 100;
-let enemyHP = 100;
-
-// Start Battle
-export function startBattle() {
-    console.log('⚔️ Battle Started!');
-    battleState.active = true; // Ensure battle state is correctly updated
-    battleLoop();
+// 🛡️ Main Menu Logic
+function handleMainMenu(key) {
+    if (key === '1') {
+        currentMenu = 'attack';
+    } else if (key === '2') {
+        console.log('🏃 Player ran away!');
+        battleState.active = false;
+    }
 }
 
-
-// Render Battle Scene
-function renderBattleScene() {
-    // Draw Battle Background
-    ctx.drawImage(battleBackgroundImg, 0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    // Player Sprite
-    ctx.drawImage(playerImg, 100, 300, 100, 100); // Position and size for player in battle
-
-    // Enemy Sprite
-    ctx.drawImage(enemyImg, 400, 300, 100, 100); // Position and size for enemy in battle
-
-    // HP Bars
-    ctx.fillStyle = 'white';
-    ctx.font = '16px Arial';
-    ctx.fillText(`Player HP: ${playerHP}`, 50, 50);
-    ctx.fillText(`Enemy HP: ${enemyHP}`, 450, 50);
-
-    // Action Menu
-    ctx.fillText('Choose Your Move:', 50, 400);
-    ctx.fillText('1. Tackle', 50, 430);
-    ctx.fillText('2. Fireball', 50, 450);
-    ctx.fillText('3. Heal', 50, 470);
-    ctx.fillText('4. Defend', 50, 490);
-}
-
-// Handle Player Actions
-function handlePlayerAction(action) {
-    switch (action) {
-        case '1':
-            console.log('Player used Tackle!');
-            enemyHP -= 10;
-            break;
-        case '2':
-            console.log('Player used Fireball!');
-            enemyHP -= 15;
-            break;
-        case '3':
-            console.log('Player used Heal!');
-            playerHP = Math.min(playerHP + 20, 100);
-            break;
-        case '4':
-            console.log('Player used Defend!');
-            playerHP -= 5;
-            break;
+// ⚔️ Attack Menu Logic
+function handleAttackMenu(key) {
+    if (key === '1') {
+        enemyHP -= 20;
+        console.log('⚔️ Player used Slash!');
+    } else if (key === '2') {
+        enemyHP -= 25;
+        console.log('🔥 Player used Fireball!');
     }
 
     enemyTurn();
-    checkBattleOutcome();
+    currentMenu = 'main';
 }
 
-// Enemy Turn
+// 🐍 Enemy Turn Logic
 function enemyTurn() {
-    console.log('Enemy attacks!');
-    playerHP -= 10;
-}
+    console.log('👹 Enemy attacks!');
+    playerHP -= 15;
 
-// Check Battle Outcome
-function checkBattleOutcome() {
     if (playerHP <= 0) {
-        console.log('💀 Player has been defeated!');
-        endBattle();
+        console.log('💀 Player defeated!');
+        battleState.active = false;
     } else if (enemyHP <= 0) {
-        console.log('🎉 Enemy has been defeated!');
-        endBattle();
+        console.log('🎉 Enemy defeated!');
+        battleState.active = false;
     }
 }
 
-// End Battle
-function endBattle() {
-    console.log('🏁 Battle Over');
-    battleState.active = false;
+// 🖌️ Render Health Bars
+function renderHealthBar(x, y, width, height, currentHP, maxHP, color) {
+    ctx.fillStyle = 'gray'; // Background of the health bar
+    ctx.fillRect(x, y, width, height);
+
+    let healthPercentage = currentHP / maxHP;
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, width * healthPercentage, height);
+
+    // Outline
+    ctx.strokeStyle = 'black';
+    ctx.strokeRect(x, y, width, height);
 }
 
-// Battle Loop
-function battleLoop() {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    renderBattleScene();
-    if (battleState.active) {
-        requestAnimationFrame(battleLoop);
+// 🖌️ Render Battle Scene
+export function renderBattle() {
+    if (battleState.transitioning) return;
+
+    // 🎨 Draw Background
+    ctx.drawImage(battleBackgroundImg, 0, 0, canvas.width, canvas.height);
+
+    // 🎮 Draw Player
+    ctx.drawImage(playerImg, 50, 300, 100, 100);
+    renderHealthBar(50, 270, 150, 15, playerHP, playerMaxHP, 'green'); // Player Health Bar
+
+    // 🎮 Draw Enemy
+    ctx.drawImage(enemyImg, 450, 300, 100, 100);
+    renderHealthBar(450, 270, 150, 15, enemyHP, enemyMaxHP, 'red'); // Enemy Health Bar
+
+    // 📝 Health Text
+    ctx.fillStyle = 'white';
+    ctx.font = '16px Arial';
+    ctx.fillText(`Player HP: ${playerHP}`, 50, 260);
+    ctx.fillText(`Enemy HP: ${enemyHP}`, 450, 260);
+
+    // 📝 Menu Display
+    ctx.fillText('Choose Your Move:', 50, 400);
+    if (currentMenu === 'main') {
+        ctx.fillText('1. Attack', 50, 430);
+        ctx.fillText('2. Run', 50, 450);
+    } else if (currentMenu === 'attack') {
+        ctx.fillText('1. Slash', 50, 430);
+        ctx.fillText('2. Fireball', 50, 450);
     }
+}
+
+// 🎬 Start Battle
+export function startBattle() {
+    transitionToBattle(() => {
+        console.log('⚔️ Battle Started!');
+    });
 }

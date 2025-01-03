@@ -1,14 +1,14 @@
 import { canvas, ctx, playerImg, mapImg, enemyImg, battleBackgroundImg } from './assets.js';
 import { renderNpcs, renderChatbox, handleNpcKeyEvents, updateNpcMovement, chatActive } from './npc.js';
 import { renderMap, renderPlayer } from './map.js';
-import { startBattle, battleState, initializeBattleControls, renderBattle} from './battle.js';
+import { startBattle, battleState, initializeBattleControls, renderBattle } from './battle.js';
 
-// 🕹️ Key Events
+// Key Events
 const keys = {};
 window.addEventListener('keydown', (e) => (keys[e.key] = true));
 window.addEventListener('keyup', (e) => (keys[e.key] = false));
 
-// 📍 Player Object
+// Player Object
 const player = {
     x: 100,
     y: 924,
@@ -18,7 +18,7 @@ const player = {
     health: 100,
 };
 
-// 📸 Camera Object
+// Camera Object
 const camera = {
     x: 0,
     y: 2048 - 480,
@@ -26,30 +26,29 @@ const camera = {
     height: canvas.height,
 };
 
-// Handle NPC Key Events
+// Initialize Battle Controls
 handleNpcKeyEvents(player);
 initializeBattleControls();
 
-// 🛡️ Player and Camera Update
+// Update Player and Camera
 function updatePlayerAndCamera() {
-    if (battleState.active) return; // Disable movement in battle mode
+    if (battleState.active) return;
 
     if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
     if (keys['ArrowDown'] && player.y < 2048 - player.height) player.y += player.speed;
     if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
     if (keys['ArrowRight'] && player.x < 2048 - player.width) player.x += player.speed;
 
-    // Camera Updates
     camera.x = Math.max(0, Math.min(player.x - camera.width / 2, 2048 - camera.width));
     camera.y = Math.max(0, Math.min(player.y - camera.height / 2, 2048 - camera.height));
 }
 
-// 🎮 Game Loop
+// Game Loop
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (battleState.active) {
-        renderBattle(); // Switch to battle scene
+        renderBattle();
     } else {
         updatePlayerAndCamera();
         updateNpcMovement();
@@ -62,7 +61,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// 🛠️ Asset Loading
+// Asset Loading
 function checkAllAssetsLoaded() {
     if (
         mapImg.complete &&
@@ -75,7 +74,7 @@ function checkAllAssetsLoaded() {
     }
 }
 
-// ✅ Start Game
+// Start Game
 mapImg.onload = checkAllAssetsLoaded;
 playerImg.onload = checkAllAssetsLoaded;
 enemyImg.onload = checkAllAssetsLoaded;
