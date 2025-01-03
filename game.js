@@ -1,17 +1,14 @@
-import { canvas, ctx, playerImg, mapImg, enemyImg, battleBackgroundImg } from './assets.js';
+import { ctx, canvas, playerImg, mapImg, enemyImg, battleBackgroundImg } from './assets.js';
 import { renderNpcs, renderChatbox, handleNpcKeyEvents, updateNpcMovement, chatActive } from './npc.js';
-import { renderMap, renderPlayer } from './map.js';
-import { startBattle, battleState, initializeBattleControls, renderBattle } from './battle.js';
+import { renderMap, renderPlayer, checkCollision } from './map.js';
+import { startBattle, battleState, renderBattle } from './battle.js';
 
-// Initialize Battle Controls
-initializeBattleControls();
-
-// Key Events
+// 🕹️ Key Events
 const keys = {};
 window.addEventListener('keydown', (e) => (keys[e.key] = true));
 window.addEventListener('keyup', (e) => (keys[e.key] = false));
 
-// Player Object
+// 📍 Player Object
 const player = {
     x: 100,
     y: 924,
@@ -21,7 +18,7 @@ const player = {
     health: 100,
 };
 
-// Camera Object
+// 📸 Camera Object
 const camera = {
     x: 0,
     y: 2048 - 480,
@@ -29,29 +26,42 @@ const camera = {
     height: canvas.height,
 };
 
-// Initialize Battle Controls
+// Handle NPC Key Events
 handleNpcKeyEvents(player);
-initializeBattleControls();
 
-// Update Player and Camera
+// 🛡️ Player and Camera Update
 function updatePlayerAndCamera() {
-    if (battleState.active) return;
+    if (battleState.active) return; // Disable movement in battle mode
 
-    if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
-    if (keys['ArrowDown'] && player.y < 2048 - player.height) player.y += player.speed;
-    if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
-    if (keys['ArrowRight'] && player.x < 2048 - player.width) player.x += player.speed;
+    // Initialize newX and newY with current player position
+    let newX = player.x;
+    let newY = player.y;
 
+    // Update temporary position based on key inputs
+    if (keys['ArrowUp']) newY -= player.speed;
+    if (keys['ArrowDown']) newY += player.speed;
+    if (keys['ArrowLeft']) newX -= player.speed;
+    if (keys['ArrowRight']) newX += player.speed;
+
+    // Check collision before applying new position
+    if (!checkCollision(newX, player.y, player)) {
+        player.x = newX; // Update x-coordinate if no collision
+    }
+    if (!checkCollision(player.x, newY, player)) {
+        player.y = newY; // Update y-coordinate if no collision
+    }
+
+    // Update camera to follow the player
     camera.x = Math.max(0, Math.min(player.x - camera.width / 2, 2048 - camera.width));
     camera.y = Math.max(0, Math.min(player.y - camera.height / 2, 2048 - camera.height));
 }
 
-// Game Loop
+// 🎮 Game Loop
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (battleState.active) {
-        renderBattle();
+        renderBattle(); // Switch to battle scene
     } else {
         updatePlayerAndCamera();
         updateNpcMovement();
@@ -64,7 +74,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Asset Loading
+// 🛠️ Asset Loading
 function checkAllAssetsLoaded() {
     if (
         mapImg.complete &&
@@ -77,7 +87,7 @@ function checkAllAssetsLoaded() {
     }
 }
 
-// Start Game
+// ✅ Start Game
 mapImg.onload = checkAllAssetsLoaded;
 playerImg.onload = checkAllAssetsLoaded;
 enemyImg.onload = checkAllAssetsLoaded;

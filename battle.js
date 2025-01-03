@@ -14,16 +14,17 @@ let playerMaxHP = 100;
 let enemyMaxHP = 100;
 
 let currentMenu = 'main';
+let hoveredOption = null; // Tracks the hovered option
 
 // 📊 Menu Options
 const menuOptions = {
     main: [
-        { text: 'Attack', x: 20, y: 420, width: 100, height: 40, action: () => currentMenu = 'attack' },
-        { text: 'Run', x: 140, y: 420, width: 100, height: 40, action: runAway }
+        { id: 'attack', text: 'Attack', x: 50, y: 420, width: 150, height: 50, action: () => currentMenu = 'attack' },
+        { id: 'run', text: 'Run', x: 250, y: 420, width: 150, height: 50, action: runAway }
     ],
     attack: [
-        { text: 'Slash', x: 20, y: 420, width: 100, height: 40, action: () => playerAttack('Slash') },
-        { text: 'Fireball', x: 140, y: 420, width: 100, height: 40, action: () => playerAttack('Fireball') }
+        { id: 'slash', text: 'Slash', x: 50, y: 420, width: 150, height: 50, action: () => playerAttack('Slash') },
+        { id: 'fireball', text: 'Fireball', x: 250, y: 420, width: 150, height: 50, action: () => playerAttack('Fireball') }
     ]
 };
 
@@ -105,11 +106,11 @@ export function renderBattle() {
 
     // 🎮 Draw Player
     ctx.drawImage(playerImg, 50, 300, 100, 100);
-    renderHealthBar(50, 270, 150, 15, playerHP, playerMaxHP, 'green'); // Player Health Bar
+    renderHealthBar(50, 270, 150, 15, playerHP, playerMaxHP, 'green');
 
     // 🎮 Draw Enemy
     ctx.drawImage(enemyImg, 450, 300, 100, 100);
-    renderHealthBar(450, 270, 150, 15, enemyHP, enemyMaxHP, 'red'); // Enemy Health Bar
+    renderHealthBar(450, 270, 150, 15, enemyHP, enemyMaxHP, 'red');
 
     // 📝 Health Text
     ctx.fillStyle = 'white';
@@ -122,18 +123,47 @@ export function renderBattle() {
     ctx.fillRect(0, 400, canvas.width, 80); // Menu Background
 
     menuOptions[currentMenu].forEach(option => {
-        ctx.fillStyle = 'white';
+        // Hover Style
+        if (hoveredOption === option.id) {
+            ctx.fillStyle = '#FFD700'; // Highlighted Gold
+        } else {
+            ctx.fillStyle = 'white';
+        }
+
         ctx.fillRect(option.x, option.y, option.width, option.height);
         ctx.strokeStyle = 'black';
         ctx.strokeRect(option.x, option.y, option.width, option.height);
 
+        // Button Text
         ctx.fillStyle = 'black';
         ctx.font = '14px Arial';
-        ctx.fillText(option.text, option.x + 20, option.y + 25);
+        ctx.fillText(option.text, option.x + 40, option.y + 30);
     });
 }
 
-// 🖱️ Handle Clicks for Menu
+// 🖱️ Handle Hover
+canvas.addEventListener('mousemove', (e) => {
+    if (!battleState.active || battleState.transitioning) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    hoveredOption = null; // Reset hover
+
+    menuOptions[currentMenu].forEach(option => {
+        if (
+            mouseX >= option.x &&
+            mouseX <= option.x + option.width &&
+            mouseY >= option.y &&
+            mouseY <= option.y + option.height
+        ) {
+            hoveredOption = option.id; // Set hover state
+        }
+    });
+});
+
+// 🖱️ Handle Clicks
 canvas.addEventListener('click', (e) => {
     if (!battleState.active || battleState.transitioning) return;
 
@@ -152,11 +182,6 @@ canvas.addEventListener('click', (e) => {
         }
     });
 });
-
-// 🎮 Initialize Battle Controls
-export function initializeBattleControls() {
-    console.log('🎮 Battle controls initialized.');
-}
 
 // 🎬 Start Battle
 export function startBattle() {
