@@ -30,6 +30,40 @@ export function checkCollision(newX, newY, player) {
         newY + player.height > boundary.y &&
         newY < boundary.y + boundary.height
     );
+
+        // Render collision boundaries in debug mode
+        if (debugMode) {
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+            collisionBoundaries.forEach(boundary => {
+                ctx.fillRect(
+                    boundary.x - camera.x,
+                    boundary.y - camera.y,
+                    boundary.width,
+                    boundary.height
+                );
+                ctx.strokeStyle = 'red';
+                ctx.strokeRect(
+                    boundary.x - camera.x,
+                    boundary.y - camera.y,
+                    boundary.width,
+                    boundary.height
+                );
+            });
+    
+            // Player Boundary
+            ctx.strokeStyle = 'blue';
+            ctx.strokeRect(
+                player.x - camera.x,
+                player.y - camera.y,
+                player.width,
+                player.height
+            );
+    
+            // Player Coords
+            ctx.fillStyle = 'yellow';
+            ctx.font = '14px Arial';
+            ctx.fillText(`Player: (${player.x}, ${player.y})`, 10, 20);
+        }
 }
 
 // 🐞 Debug Mode Rendering

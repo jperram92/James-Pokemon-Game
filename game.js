@@ -55,6 +55,11 @@ function updatePlayerAndCamera() {
         player.y = newY;
     }
 
+    // Check interaction with NPCs
+    if (keys[' '] && !chatActive) {
+        checkNpcInteraction(player);
+    }
+
     player.x = Math.max(0, Math.min(player.x, 2048 - player.width));
     player.y = Math.max(0, Math.min(player.y, 2048 - player.height));
 
