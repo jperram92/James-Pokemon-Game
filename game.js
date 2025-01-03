@@ -3,6 +3,9 @@ import { renderNpcs, renderChatbox, handleNpcKeyEvents, updateNpcMovement, chatA
 import { renderMap, renderPlayer } from './map.js';
 import { startBattle, battleState, initializeBattleControls, renderBattle } from './battle.js';
 
+// Initialize Battle Controls
+initializeBattleControls();
+
 // Key Events
 const keys = {};
 window.addEventListener('keydown', (e) => (keys[e.key] = true));

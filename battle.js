@@ -8,17 +8,26 @@ export let battleState = {
     enemyTurn: false,
 };
 
-// Battle Variables
 let playerHP = 100;
 let enemyHP = 100;
 let playerMaxHP = 100;
 let enemyMaxHP = 100;
 
-let battleOptions = ['Attack', 'Run'];
-let attackMoves = ['Slash', 'Fireball'];
 let currentMenu = 'main';
 
-// 🎬 Pagination Transition Effect
+// 📊 Menu Options
+const menuOptions = {
+    main: [
+        { text: 'Attack', x: 20, y: 420, width: 100, height: 40, action: () => currentMenu = 'attack' },
+        { text: 'Run', x: 140, y: 420, width: 100, height: 40, action: runAway }
+    ],
+    attack: [
+        { text: 'Slash', x: 20, y: 420, width: 100, height: 40, action: () => playerAttack('Slash') },
+        { text: 'Fireball', x: 140, y: 420, width: 100, height: 40, action: () => playerAttack('Fireball') }
+    ]
+};
+
+// 🎬 Transition to Battle
 function transitionToBattle(callback) {
     let opacity = 0;
     battleState.transitioning = true;
@@ -39,41 +48,24 @@ function transitionToBattle(callback) {
     fadeIn();
 }
 
-// 🎮 Initialize Battle Controls
-export function initializeBattleControls() {
-    window.addEventListener('keydown', (e) => {
-        if (battleState.active && !battleState.transitioning) {
-            if (currentMenu === 'main') {
-                handleMainMenu(e.key);
-            } else if (currentMenu === 'attack') {
-                handleAttackMenu(e.key);
-            }
-        }
-    });
-}
-
-// 🛡️ Main Menu Logic
-function handleMainMenu(key) {
-    if (key === '1') {
-        currentMenu = 'attack';
-    } else if (key === '2') {
-        console.log('🏃 Player ran away!');
-        battleState.active = false;
-    }
-}
-
-// ⚔️ Attack Menu Logic
-function handleAttackMenu(key) {
-    if (key === '1') {
+// ⚔️ Player Attacks
+function playerAttack(move) {
+    if (move === 'Slash') {
         enemyHP -= 20;
         console.log('⚔️ Player used Slash!');
-    } else if (key === '2') {
+    } else if (move === 'Fireball') {
         enemyHP -= 25;
         console.log('🔥 Player used Fireball!');
     }
 
     enemyTurn();
     currentMenu = 'main';
+}
+
+// 🏃 Player Runs Away
+function runAway() {
+    console.log('🏃 Player ran away!');
+    battleState.active = false;
 }
 
 // 🐍 Enemy Turn Logic
@@ -126,14 +118,44 @@ export function renderBattle() {
     ctx.fillText(`Enemy HP: ${enemyHP}`, 450, 260);
 
     // 📝 Menu Display
-    ctx.fillText('Choose Your Move:', 50, 400);
-    if (currentMenu === 'main') {
-        ctx.fillText('1. Attack', 50, 430);
-        ctx.fillText('2. Run', 50, 450);
-    } else if (currentMenu === 'attack') {
-        ctx.fillText('1. Slash', 50, 430);
-        ctx.fillText('2. Fireball', 50, 450);
-    }
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 400, canvas.width, 80); // Menu Background
+
+    menuOptions[currentMenu].forEach(option => {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(option.x, option.y, option.width, option.height);
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(option.x, option.y, option.width, option.height);
+
+        ctx.fillStyle = 'black';
+        ctx.font = '14px Arial';
+        ctx.fillText(option.text, option.x + 20, option.y + 25);
+    });
+}
+
+// 🖱️ Handle Clicks for Menu
+canvas.addEventListener('click', (e) => {
+    if (!battleState.active || battleState.transitioning) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    menuOptions[currentMenu].forEach(option => {
+        if (
+            mouseX >= option.x &&
+            mouseX <= option.x + option.width &&
+            mouseY >= option.y &&
+            mouseY <= option.y + option.height
+        ) {
+            option.action();
+        }
+    });
+});
+
+// 🎮 Initialize Battle Controls
+export function initializeBattleControls() {
+    console.log('🎮 Battle controls initialized.');
 }
 
 // 🎬 Start Battle
